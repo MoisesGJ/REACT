@@ -1,42 +1,54 @@
 import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-//[(user, setUser)] = useState();
-
 function App() {
-  const [text, setText] = useState('Hola');
-  const [user, setUser] = useState({});
+  const [language, setLanguage] = useState('Buenos días');
 
-  const textHandler = ({ target }) => {
-    const value = target.value;
-
-    setText(value);
+  const mapLang = {
+    es: 'Buenos días',
+    en: 'Good Morning',
+    fr: 'Bonjour',
   };
 
-  const userHandler = ({ target }) => {
-    const name = target.name;
+  const languageHandler = ({ target }) => {
     const value = target.value;
 
-    setUser({ ...user, [name]: value });
+    setLanguage(value);
   };
 
   return (
     <>
-      <input
-        type="text"
-        placeholder="Name"
-        name="name"
-        onChange={(event) => userHandler(event)}
-      />
-      <input
-        type="text"
-        placeholder="Lastname"
-        name="lastname"
-        onChange={(event) => userHandler(event)}
-      />
-
-      <h2>Name: {user.name}</h2>
-      <h2>Lastname: {user.lastname}</h2>
+      <form className="container d-flex justify-content-around my-5">
+        <label>
+          <input
+            type="radio"
+            name="lang"
+            value="Buenos días"
+            onChange={(event) => languageHandler(event)}
+            defaultChecked
+          />
+          <span className="ms-1">ES</span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="lang"
+            value="Good morning"
+            onChange={(event) => languageHandler(event)}
+          />
+          <span className="ms-1">EN</span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="lang"
+            value="Bonjour"
+            onChange={(event) => languageHandler(event)}
+          />
+          <span className="ms-1">FR</span>
+        </label>
+      </form>
+      <h1 className="text-center fw-bold">{language}</h1>
     </>
   );
 }
