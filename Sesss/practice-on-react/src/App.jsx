@@ -2,54 +2,74 @@ import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
-  const [language, setLanguage] = useState('Buenos días');
+  const [product, setProduct] = useState({});
 
-  const mapLang = {
-    es: 'Buenos días',
-    en: 'Good Morning',
-    fr: 'Bonjour',
-  };
-
-  const languageHandler = ({ target }) => {
-    const value = target.value;
-
-    setLanguage(value);
+  const productHandler = ({ target }) => {
+    setProduct({ ...product, [target.name]: target.value });
   };
 
   return (
-    <>
-      <form className="container d-flex justify-content-around my-5">
-        <label>
+    <main className="border border-white border-3 rounded d-flex p-5 gap-3">
+      <form className="border border-white border-3 rounded d-flex flex-column justify-content-around p-3">
+        <label htmlFor="name" className="d-flex flex-column fw-bold text-white">
+          Nombre
           <input
-            type="radio"
-            name="lang"
-            value="Buenos días"
-            onChange={(event) => languageHandler(event)}
-            defaultChecked
+            type="text"
+            id="name"
+            name="name"
+            onChange={(event) => productHandler(event)}
           />
-          <span className="ms-1">ES</span>
         </label>
-        <label>
+        <label
+          htmlFor="descrition"
+          className="d-flex flex-column fw-bold text-white"
+        >
+          Descripción
           <input
-            type="radio"
-            name="lang"
-            value="Good morning"
-            onChange={(event) => languageHandler(event)}
+            type="text"
+            id="description"
+            name="description"
+            onChange={(event) => productHandler(event)}
           />
-          <span className="ms-1">EN</span>
         </label>
-        <label>
+        <label
+          htmlFor="price"
+          className="d-flex flex-column fw-bold text-white"
+        >
+          Precio
           <input
-            type="radio"
-            name="lang"
-            value="Bonjour"
-            onChange={(event) => languageHandler(event)}
+            type="text"
+            id="price"
+            name="price"
+            onChange={(event) => productHandler(event)}
           />
-          <span className="ms-1">FR</span>
+        </label>
+        <label
+          htmlFor="image"
+          className="d-flex flex-column fw-bold text-white"
+        >
+          Imagen
+          <input
+            type="text"
+            id="image"
+            name="image"
+            onChange={(event) => productHandler(event)}
+          />
         </label>
       </form>
-      <h1 className="text-center fw-bold">{language}</h1>
-    </>
+      <div className="border border-white border-3 rounded d-flex flex-column p-5">
+        <img
+          src={product.image}
+          className="w-75 img-thumbnail mx-auto mb-5"
+          style={{ maxWidth: '300px' }}
+        />
+        <h5 className="fw-bold text-white" name>
+          {product.name}
+        </h5>
+        <h5 className="fw-bold text-white">{product.description}</h5>
+        <h5 className="fw-bold text-white">{product.price}</h5>
+      </div>
+    </main>
   );
 }
 
