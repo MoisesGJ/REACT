@@ -1,73 +1,111 @@
 import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 
 function App() {
-  const [product, setProduct] = useState({});
+  const [toDoText, setToDoText] = useState('');
+  const [toDoPriority, setToDoPriority] = useState();
+  const [toDoes, setToDoes] = useState([]);
 
-  const productHandler = ({ target }) => {
-    setProduct({ ...product, [target.name]: target.value });
+  const toDoTextHandler = ({ target }) => {
+    setToDoText(target.value);
+  };
+
+  const toDoPriorityHandler = ({ target }) => {
+    setToDoPriority(target.value);
+  };
+
+  const addList = () => {
+    const itemText = toDoText;
+    const itemPrioity = toDoPriority;
+
+    const objToDo = { text: itemText, priority: itemPrioity, isChecked: false };
+
+    const currToDoID = toDoes.length > 0 ? toDoes[toDoes.length - 1].id + 1 : 1;
+
+    objToDo['id'] = currToDoID;
+
+    setToDoes([...toDoes, objToDo]);
+  };
+
+  const toDoCheckbox = ({ target }) => {
+    const idCurr = target.name - 1;
+
+    toDoes[idCurr].isChecked = !toDoes[idCurr].isChecked;
+
+    setToDoes([...toDoes]);
   };
 
   return (
-    <main className="border border-white border-3 rounded d-flex p-5 gap-3">
-      <form className="border border-white border-3 rounded d-flex flex-column justify-content-around p-3">
-        <label htmlFor="name" className="d-flex flex-column fw-bold text-white">
-          Nombre
-          <input
-            type="text"
-            id="name"
-            name="name"
-            onChange={(event) => productHandler(event)}
-          />
-        </label>
-        <label
-          htmlFor="descrition"
-          className="d-flex flex-column fw-bold text-white"
-        >
-          Descripción
-          <input
-            type="text"
-            id="description"
-            name="description"
-            onChange={(event) => productHandler(event)}
-          />
-        </label>
-        <label
-          htmlFor="price"
-          className="d-flex flex-column fw-bold text-white"
-        >
-          Precio
-          <input
-            type="text"
-            id="price"
-            name="price"
-            onChange={(event) => productHandler(event)}
-          />
-        </label>
-        <label
-          htmlFor="image"
-          className="d-flex flex-column fw-bold text-white"
-        >
-          Imagen
-          <input
-            type="text"
-            id="image"
-            name="image"
-            onChange={(event) => productHandler(event)}
-          />
-        </label>
-      </form>
-      <div className="border border-white border-3 rounded d-flex flex-column p-5">
-        <img
-          src={product.image}
-          className="w-75 img-thumbnail mx-auto mb-5"
-          style={{ maxWidth: '300px' }}
-        />
-        <h5 className="fw-bold text-white" name>
-          {product.name}
-        </h5>
-        <h5 className="fw-bold text-white">{product.description}</h5>
-        <h5 className="fw-bold text-white">{product.price}</h5>
+    <main className="border border-white border-3 rounded gap-3 container">
+      <div className="row p-3">
+        <div className="col-12 col-md-6">
+          <h3 className="fw-bold">Lista de pendientes:</h3>
+          <ul>
+            {toDoes.map(({ text, priority, id, isChecked }) => {
+              const classLabel = isChecked
+                ? ' text-decoration-line-through'
+                : '';
+
+              return (
+                <li className="list-group-item">
+                  <label htmlFor="" className={priority + classLabel}>
+                    {text.length > 20 ? `${text.slice(0, 20)}...` : text}
+                    <input
+                      type="checkbox"
+                      name={id}
+                      onChange={toDoCheckbox}
+                      className="ms-2"
+                    />
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="col-12 col-md-6">
+          <h3 className="fw-bold">Nuevo pendiente:</h3>
+          <input type="text" onChange={toDoTextHandler} />
+          <h4 className="mt-3">Prioridad</h4>
+          <div className="d-flex flex-column align-items-start gap-3">
+            <label htmlFor="baja">
+              <input
+                type="radio"
+                name="priority"
+                id="baja"
+                value="baja"
+                className="me-2"
+                onChange={toDoPriorityHandler}
+              />
+              Baja
+            </label>
+            <label htmlFor="media">
+              <input
+                type="radio"
+                name="priority"
+                id="media"
+                value="media"
+                className="me-2"
+                onChange={toDoPriorityHandler}
+              />
+              Media
+            </label>
+            <label htmlFor="importante">
+              <input
+                type="radio"
+                name="priority"
+                id="importante"
+                value="importante"
+                className="me-2"
+                onChange={toDoPriorityHandler}
+              />
+              Para ayer!!!
+            </label>
+          </div>
+          <button className="mt-3 btn btn-dark" onClick={addList}>
+            Guardar
+          </button>
+        </div>
       </div>
     </main>
   );

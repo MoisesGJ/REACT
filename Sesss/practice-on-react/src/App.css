@@ -1,0 +1,14 @@
+* {
+  font-size: 18px;
+}
+.baja {
+  color: rgba(19, 242, 19, 0.75);
+}
+
+.media {
+  color: rgb(78, 131, 164);
+}
+
+.importante {
+  color: rgb(223, 14, 14);
+}
