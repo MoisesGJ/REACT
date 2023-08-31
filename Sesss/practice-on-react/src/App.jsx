@@ -3,8 +3,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 function App() {
-  const [toDoText, setToDoText] = useState('');
-  const [toDoPriority, setToDoPriority] = useState();
+  const [toDoText, setToDoText] = useState(
+    <b className="text-white">No tienes pendientes :C</b>
+  );
+  const [toDoPriority, setToDoPriority] = useState('media');
   const [toDoes, setToDoes] = useState([]);
 
   const toDoTextHandler = ({ target }) => {
@@ -19,17 +21,19 @@ function App() {
     const itemText = toDoText;
     const itemPrioity = toDoPriority;
 
-    const objToDo = { text: itemText, priority: itemPrioity, isChecked: false };
+    const objToDo = {
+      id: toDoes.length,
+      text: itemText,
+      priority: itemPrioity,
+      isChecked: false,
+    };
 
-    const currToDoID = toDoes.length > 0 ? toDoes[toDoes.length - 1].id + 1 : 1;
-
-    objToDo['id'] = currToDoID;
-
-    setToDoes([...toDoes, objToDo]);
+    itemText.length > 0 && setToDoes([...toDoes, objToDo]);
+    setToDoText('');
   };
 
   const toDoCheckbox = ({ target }) => {
-    const idCurr = target.name - 1;
+    const idCurr = target.name;
 
     toDoes[idCurr].isChecked = !toDoes[idCurr].isChecked;
 
@@ -41,34 +45,49 @@ function App() {
       <div className="row p-3">
         <div className="col-12 col-md-6">
           <h3 className="fw-bold">Lista de pendientes:</h3>
-          <ul>
+          <hr className="border-white border-2" />
+          <ul className="p-0">
             {toDoes.map(({ text, priority, id, isChecked }) => {
-              const classLabel = isChecked
-                ? ' text-decoration-line-through'
-                : '';
-
               return (
                 <li className="list-group-item">
-                  <label htmlFor="" className={priority + classLabel}>
-                    {text.length > 20 ? `${text.slice(0, 20)}...` : text}
+                  <label
+                    htmlFor={`todo-${id}`}
+                    className={`fw-bold ${priority} ${
+                      isChecked ? 'text-decoration-line-through fst-italic' : ''
+                    }`}
+                  >
                     <input
                       type="checkbox"
                       name={id}
+                      id={`todo-${id}`}
                       onChange={toDoCheckbox}
-                      className="ms-2"
+                      className="me-2"
                     />
+                    {text}
                   </label>
                 </li>
               );
             })}
+            <li className="list-group-item">
+              <label htmlFor="curr" className={`fw-bold h4 ${toDoPriority}`}>
+                {toDoText}
+              </label>
+            </li>
           </ul>
         </div>
         <div className="col-12 col-md-6">
           <h3 className="fw-bold">Nuevo pendiente:</h3>
-          <input type="text" onChange={toDoTextHandler} />
-          <h4 className="mt-3">Prioridad</h4>
-          <div className="d-flex flex-column align-items-start gap-3">
-            <label htmlFor="baja">
+          <hr className="border-2 border-white" />
+          <input
+            type="text"
+            onChange={toDoTextHandler}
+            className="w-100 px-2"
+            value={typeof toDoText === 'object' ? '' : toDoText}
+            placeholder="Ingresa el pendiente..."
+          />
+          <h4 className="mt-3 fw-bold">Prioridad</h4>
+          <div className="d-flex flex-column align-items-start gap-2">
+            <label htmlFor="baja" className="fw-bold baja h5">
               <input
                 type="radio"
                 name="priority"
@@ -79,7 +98,7 @@ function App() {
               />
               Baja
             </label>
-            <label htmlFor="media">
+            <label htmlFor="media" className="fw-bold media h5">
               <input
                 type="radio"
                 name="priority"
@@ -87,10 +106,11 @@ function App() {
                 value="media"
                 className="me-2"
                 onChange={toDoPriorityHandler}
+                defaultChecked
               />
               Media
             </label>
-            <label htmlFor="importante">
+            <label htmlFor="importante" className="fw-bold importante h5">
               <input
                 type="radio"
                 name="priority"
@@ -99,12 +119,17 @@ function App() {
                 className="me-2"
                 onChange={toDoPriorityHandler}
               />
-              Para ayer!!!
+              ¡Para ayer!
             </label>
           </div>
-          <button className="mt-3 btn btn-dark" onClick={addList}>
-            Guardar
-          </button>
+          <div className="text-center text-md-end">
+            <button
+              className="mt-3 btn btn-dark w-50 fw-bold"
+              onClick={addList}
+            >
+              Añadir
+            </button>
+          </div>
         </div>
       </div>
     </main>

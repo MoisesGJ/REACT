@@ -1,6 +1,17 @@
 * {
   font-size: 18px;
 }
+
+li > label {
+  width: 50vh;
+  font-size: 20px;
+  padding-right: 2px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ' ...';
+}
+
 .baja {
   color: rgba(19, 242, 19, 0.75);
 }
