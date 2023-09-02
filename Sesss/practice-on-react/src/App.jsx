@@ -3,133 +3,201 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 function App() {
-  const [toDoText, setToDoText] = useState(
-    <b className="text-white">No tienes pendientes :C</b>
-  );
-  const [toDoPriority, setToDoPriority] = useState('media');
-  const [toDoes, setToDoes] = useState([]);
+  const [name, setName] = useState();
+  const [image, setImage] = useState();
 
-  const toDoTextHandler = ({ target }) => {
-    setToDoText(target.value);
+  const [people, setPeople] = useState([]);
+
+  const mapTeam = {
+    1: {
+      count: 0,
+    },
+    2: {
+      count: 0,
+    },
+    3: {
+      count: 0,
+    },
   };
 
-  const toDoPriorityHandler = ({ target }) => {
-    setToDoPriority(target.value);
+  let errorAddTeam = false;
+
+  const nameHandler = ({ target }) => {
+    setName(target.value);
+  };
+  const imageHandler = ({ target }) => {
+    setImage(target.value);
   };
 
-  const addList = () => {
-    const itemText = toDoText;
-    const itemPrioity = toDoPriority;
-
-    const objToDo = {
-      id: toDoes.length,
-      text: itemText,
-      priority: itemPrioity,
-      isChecked: false,
-    };
-
-    itemText.length > 0 && setToDoes([...toDoes, objToDo]);
-    setToDoText('');
+  const addPerson = () => {
+    setPeople([
+      ...people,
+      {
+        id: people.length + 1,
+        name,
+        image: `https://randomuser.me/api/portraits/men/${Math.floor(
+          Math.random() * 100
+        )}.jpg`,
+        team: null,
+      },
+    ]);
+    setName('');
+    setImage('');
   };
 
-  const toDoCheckbox = ({ target }) => {
-    const idCurr = target.name;
+  const addTeam = ({ target }, key) => {
+    const newpeople = people.map((person) => {
+      person.id === key && (person.team = target.value);
 
-    toDoes[idCurr].isChecked = !toDoes[idCurr].isChecked;
+      return person;
+    });
 
-    setToDoes([...toDoes]);
+    setPeople(newpeople);
+  };
+
+  const validateTeam = () => {
+    let view;
+    Object.keys(mapTeam).forEach((position) => {
+      console.log(position, mapTeam[position]['count']);
+      if (mapTeam[position]['count'] > 3) {
+        view = 'd-block';
+        mapTeam[position]['count'] = mapTeam[position]['count'] - 1;
+      } else {
+        view = 'd-none';
+      }
+    });
+
+    return view;
   };
 
   return (
     <main className="border border-white border-3 rounded gap-3 container">
-      <div className="row p-3">
-        <div className="col-12 col-md-6">
-          <h3 className="fw-bold">Lista de pendientes:</h3>
-          <hr className="border-white border-2" />
-          <ul className="p-0">
-            {toDoes.map(({ text, priority, id, isChecked }) => {
-              return (
-                <li className="list-group-item">
-                  <label
-                    htmlFor={`todo-${id}`}
-                    className={`fw-bold ${priority} ${
-                      isChecked ? 'text-decoration-line-through fst-italic' : ''
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      name={id}
-                      id={`todo-${id}`}
-                      onChange={toDoCheckbox}
-                      className="me-2"
-                    />
-                    {text}
-                  </label>
-                </li>
-              );
-            })}
-            <li className="list-group-item">
-              <label htmlFor="curr" className={`fw-bold h4 ${toDoPriority}`}>
-                {toDoText}
+      <div className="row p-3 g-3">
+        <div
+          className={`${people.length === 0 && 'w-100'} col-12 col-lg-4 p-3`}
+        >
+          <form className="px-3">
+            <div className="mb-3">
+              <label forHtml="name" className="form-label">
+                Name
               </label>
-            </li>
-          </ul>
+              <input
+                type="text"
+                className="form-control"
+                id="name"
+                placeholder="Your name"
+                onChange={nameHandler}
+                value={name}
+              />
+            </div>
+            <div className="mb-3">
+              <label forHtml="name" className="form-label">
+                Image
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="image"
+                placeholder="Your image"
+                onChange={imageHandler}
+                value={image}
+              />
+            </div>
+            <div className="text-center">
+              <button
+                className="btn btn-lg btn-dark"
+                type="button"
+                onClick={addPerson}
+              >
+                Guardar
+              </button>
+            </div>
+          </form>
+          {people.length === 0 || (
+            <>
+              <h3 className="mt-5 fw-bold">Equipos:</h3>
+              <div className="w-100 mt-3 d-flex justify-content-around">
+                {Object.keys(mapTeam).map((teamNumber) => (
+                  <div>
+                    <h6 className="fw-bold">Equipo {teamNumber}</h6>
+                    <ul className="p-0">
+                      {people.map(({ team, name }) => {
+                        if (team == teamNumber) {
+                          const currCount = mapTeam[team]['count'];
+
+                          mapTeam[team]['count'] = currCount + 1;
+
+                          if (currCount < 3) {
+                            return <li>{name}</li>;
+                          }
+                        }
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              {setTimeout(
+                () => (
+                  <div className="alert alert-danger text-center" role="alert">
+                    Ese equipo está lleno, seleccione otro.
+                  </div>
+                ),
+
+                5000
+              )}
+            </>
+          )}
         </div>
-        <div className="col-12 col-md-6">
-          <h3 className="fw-bold">Nuevo pendiente:</h3>
-          <hr className="border-2 border-white" />
-          <input
-            type="text"
-            onChange={toDoTextHandler}
-            className="w-100 px-2"
-            value={typeof toDoText === 'object' ? '' : toDoText}
-            placeholder="Ingresa el pendiente..."
-          />
-          <h4 className="mt-3 fw-bold">Prioridad</h4>
-          <div className="d-flex flex-column align-items-start gap-2">
-            <label htmlFor="baja" className="fw-bold baja h5">
-              <input
-                type="radio"
-                name="priority"
-                id="baja"
-                value="baja"
-                className="me-2"
-                onChange={toDoPriorityHandler}
-              />
-              Baja
-            </label>
-            <label htmlFor="media" className="fw-bold media h5">
-              <input
-                type="radio"
-                name="priority"
-                id="media"
-                value="media"
-                className="me-2"
-                onChange={toDoPriorityHandler}
-                defaultChecked
-              />
-              Media
-            </label>
-            <label htmlFor="importante" className="fw-bold importante h5">
-              <input
-                type="radio"
-                name="priority"
-                id="importante"
-                value="importante"
-                className="me-2"
-                onChange={toDoPriorityHandler}
-              />
-              ¡Para ayer!
-            </label>
-          </div>
-          <div className="text-center text-md-end">
-            <button
-              className="mt-3 btn btn-dark w-50 fw-bold"
-              onClick={addList}
-            >
-              Añadir
-            </button>
-          </div>
+        <div className="col-12 col-lg-8 d-flex gap-3 flex-wrap justify-content-center">
+          {people.map(({ id, name, image, team }) => (
+            <div className="card">
+              <div className="text-center">
+                <img
+                  src={image}
+                  className="rounded-circle"
+                  style={{
+                    width: '200px',
+                    height: '200px',
+                    objectFit: 'cover',
+                  }}
+                />
+              </div>
+              <div className="card-body text-center">
+                <h5 className="card-title fw-bold">{name}</h5>
+                <code>{team ? `Equipo: ${team}` : 'Sin equipo'}</code>
+                <div className="mt-3">
+                  <button
+                    className={`btn btn-sm btn-dark ${
+                      team == 1 && 'btn-click'
+                    }`}
+                    onClick={(event) => addTeam(event, id)}
+                    value="1"
+                  >
+                    Equipo 1
+                  </button>
+                  <button
+                    className={`btn btn-sm btn-dark mx-1 ${
+                      team == 2 && 'btn-click'
+                    }`}
+                    onClick={(event) => addTeam(event, id)}
+                    value="2"
+                  >
+                    Equipo 2
+                  </button>
+                  <button
+                    className={`btn btn-sm btn-dark ${
+                      team == 3 && 'btn-click'
+                    }`}
+                    onClick={(event) => addTeam(event, id)}
+                    value="3"
+                  >
+                    Equipo 3
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </main>

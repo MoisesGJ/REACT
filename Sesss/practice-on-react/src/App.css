@@ -1,25 +1,15 @@
-* {
-  font-size: 18px;
-}
-
-li > label {
-  width: 50vh;
-  font-size: 20px;
-  padding-right: 2px;
-
+li {
+  width: 70px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ' ...';
 }
 
-.baja {
-  color: rgba(19, 242, 19, 0.75);
+.btn-sm {
+  width: 30%;
 }
 
-.media {
-  color: rgb(78, 131, 164);
-}
-
-.importante {
-  color: rgb(223, 14, 14);
+.btn-click {
+  background-color: rgb(212, 212, 212);
+  color: black;
 }
