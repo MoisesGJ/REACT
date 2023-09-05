@@ -1,93 +1,115 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
-import moment from 'moment';
-
 function App() {
-  const [people, setPerson] = useState([]);
+  const [songs, setSongs] = useState({});
+  const [update, setUpdate] = useState(false);
 
-  const [name, setName] = useState();
-  const [date, setDate] = useState();
-  const [avatar, setAvatar] = useState();
+  const [songdata, setSongdata] = useState({});
 
-  const addPerson = () => {
-    const person = {
-      key: people.length + 1,
-      name,
-      avatar,
-      age: moment().diff(date, 'years'),
-    };
+  const updateSongs = () => {
+    setUpdate(!update);
+  };
 
-    setPerson([...people, person]);
+  useEffect(() => {
+    fetch('https://javascript27g-default-rtdb.firebaseio.com/playlist/.json')
+      .then((response) => response.json())
+      .then((data) => setSongs(data));
+  }, [update]);
+
+  const inputHandler = ({ target }) => {
+    setSongdata({ ...songdata, [target.name]: target.value });
+  };
+
+  const saveSong = async () => {
+    const res = await fetch(
+      'https://javascript27g-default-rtdb.firebaseio.com/playlist/.json',
+      { method: 'POST', body: JSON.stringify(songdata) }
+    );
+    const data = await res.json();
+
+    updateSongs();
+
+    setSongs(data);
+  };
+
+  const deleteSong = async (key) => {
+    const res = await fetch(
+      `https://javascript27g-default-rtdb.firebaseio.com/playlist/${key}.json`,
+      { method: 'DELETE' }
+    );
+    const data = await res.json();
+
+    updateSongs();
+
+    setSongs(data);
   };
 
   return (
-    <main className="border border-white border-3 rounded gap-3 container">
-      <div className="row p-3 g-3">
-        <div className="col-12 col-lg-5 p-3">
-          <form>
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label">
-                Nombre
-              </label>
-              <input
-                type="text"
-                onChange={(event) => setName(event.target.value)}
-                className="form-control"
-                id="name"
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="date" className="form-label">
-                Fecha de nacimiento
-              </label>
-              <input
-                type="date"
-                onChange={(event) => setDate(event.target.value)}
-                className="form-control"
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="avatar" className="form-label">
-                Imagen
-              </label>
-              <input
-                type="avatar"
-                onChange={(event) => setAvatar(event.target.value)}
-                className="form-control"
-              />
-            </div>
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={addPerson}
-                className="btn btn-dark btn-lg"
-              >
-                Guardar
-              </button>
-            </div>
-          </form>
+    <>
+      <h1>Songs lists</h1>
+      <div className="my-2 text-end">
+        <button className="btn btn-sm btn-info" onClick={updateSongs}>
+          Actualizar
+        </button>
+      </div>
+      <form>
+        <div className="mb-3">
+          <label htmlFor="song-name" className="form-label">
+            Name
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="song-name"
+            name="name"
+            onChange={inputHandler}
+          />
         </div>
-        <div className="col-12 col-lg-7 d-flex gap-3 flex-wrap justify-content-center">
-          {people.map(({ name, age, avatar, key }) => {
+        <div className="mb-3">
+          <label htmlFor="song-author" className="form-label">
+            Author
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="song-author"
+            name="artist"
+            onChange={inputHandler}
+          />
+        </div>
+        <div className="mb-3">
+          <div className="text-center">
+            <button
+              type="button"
+              className="btn btn-dark btn-lg"
+              onClick={saveSong}
+            >
+              Guardar
+            </button>
+          </div>
+        </div>
+      </form>
+      <ul>
+        {songs &&
+          Object.keys(songs).map((key) => {
             return (
-              <div className="card flex-row" key={key}>
-                <img
-                  src={avatar}
-                  className="card-img-top rounded-circle"
-                  style={{ width: '150px' }}
-                />
-                <div className="card-body d-flex flex-column justify-content-center">
-                  <h5 className="card-title fw-bold">{name}</h5>
-                  <p className="card-text ">Tengo {age} años</p>
+              <li key={key} className=" mt-3 d-flex justify-content-between">
+                <div className="">
+                  <b>{songs[key].name}</b> de {songs[key].artist}
                 </div>
-              </div>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => deleteSong(key)}
+                >
+                  Borrar
+                </button>
+              </li>
             );
           })}
-        </div>
-      </div>
-    </main>
+      </ul>
+    </>
   );
 }
 
