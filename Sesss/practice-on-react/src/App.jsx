@@ -3,113 +3,163 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 function App() {
-  const [songs, setSongs] = useState({});
+  const [users, setUsers] = useState({});
   const [update, setUpdate] = useState(false);
+  const [isLogged, setIsLogged] = useState();
 
-  const [songdata, setSongdata] = useState({});
-
-  const updateSongs = () => {
-    setUpdate(!update);
-  };
+  const [data, setData] = useState({});
 
   useEffect(() => {
-    fetch('https://javascript27g-default-rtdb.firebaseio.com/playlist/.json')
-      .then((response) => response.json())
-      .then((data) => setSongs(data));
+    const getUsers = async () => {
+      const response = await fetch(
+        'https://javascript27g-default-rtdb.firebaseio.com/equipo1/.json'
+      );
+      const data = await response.json();
+      console.log(data);
+
+      setUsers(data);
+    };
+    getUsers();
   }, [update]);
 
-  const inputHandler = ({ target }) => {
-    setSongdata({ ...songdata, [target.name]: target.value });
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      setIsLogged(true);
+    } else {
+      setIsLogged(false);
+    }
+  }, [update]);
+
+  const dataHandler = ({ target }) => {
+    setData({ ...data, [target.name]: target.value });
+    console.log(data);
   };
 
-  const saveSong = async () => {
-    const res = await fetch(
-      'https://javascript27g-default-rtdb.firebaseio.com/playlist/.json',
-      { method: 'POST', body: JSON.stringify(songdata) }
+  const logIn = async () => {
+    const r = await fetch(
+      'https://javascript27g-default-rtdb.firebaseio.com/equipo1/.json',
+      { method: 'POST', body: JSON.stringify(data) }
     );
-    const data = await res.json();
+    const response = await r.json();
 
-    updateSongs();
+    localStorage.setItem('token', response.name);
 
-    setSongs(data);
+    setUpdate(!update);
+    setIsLogged(true);
   };
 
-  const deleteSong = async (key) => {
-    const res = await fetch(
-      `https://javascript27g-default-rtdb.firebaseio.com/playlist/${key}.json`,
-      { method: 'DELETE' }
+  const addFriend = async (key) => {
+    const token = localStorage.getItem('token');
+
+    const dataFriend = {
+      id: token,
+      friends: [],
+    };
+
+    const r = await fetch(
+      'https://javascript27g-default-rtdb.firebaseio.com/equipo1/friends/.json',
+      { method: 'POST', body: JSON.stringify(data) }
     );
-    const data = await res.json();
-
-    updateSongs();
-
-    setSongs(data);
+    const response = await r.json();
   };
 
   return (
-    <>
-      <h1>Songs lists</h1>
-      <div className="my-2 text-end">
-        <button className="btn btn-sm btn-info" onClick={updateSongs}>
-          Actualizar
-        </button>
-      </div>
-      <form>
-        <div className="mb-3">
-          <label htmlFor="song-name" className="form-label">
-            Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="song-name"
-            name="name"
-            onChange={inputHandler}
-          />
+    <main>
+      {isLogged || (
+        <div>
+          <h1 className="fw-bold my-3 text-center">Log In</h1>
+          <form>
+            <div className="mb-3">
+              <label for="name-user" className="form-label">
+                Nombre
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="name-user"
+                name="name"
+                onChange={dataHandler}
+              />
+            </div>
+            <div className="mb-3">
+              <label for="correo-user" className="form-label">
+                Correo
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="correo-user"
+                name="email"
+                onChange={dataHandler}
+              />
+            </div>
+            <div className="text-center">
+              <button
+                className="btn btn-dark btn-lg"
+                type="button"
+                onClick={logIn}
+              >
+                Guardar
+              </button>
+            </div>
+          </form>
         </div>
-        <div className="mb-3">
-          <label htmlFor="song-author" className="form-label">
-            Author
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="song-author"
-            name="artist"
-            onChange={inputHandler}
-          />
+      )}
+      {isLogged && (
+        <div className="container-fluid p-5">
+          <section className="row">
+            <div className="col-6">
+              <h3 className="fw-bold my-3 text-center">Usuarios disponibles</h3>
+              {Object.keys(users).map((key) => {
+                return (
+                  <>
+                    <div className="card mt-3 p-2" key={key}>
+                      <div className="card-body">
+                        <h5 className="card-title">
+                          Me llamo <b>{users[key].name}</b>
+                        </h5>
+                        <p>
+                          Mi <b>correo</b> es <u>{users[key].email}</u>
+                        </p>
+                        <div className="text-end">
+                          <button
+                            className="btn btn-sm btn-dark"
+                            onClick={() => addFriend(key)}
+                          >
+                            Añadir amigx
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })}
+            </div>
+            <div className="col-6">
+              <h3 className="fw-bold my-3 text-center">Mis amigos</h3>
+              {/* {Object.keys(users).map((key) => {
+                return (
+                  <>
+                    <div className="card mb-3" key={key}>
+                      <div className="card-body">
+                        <h5 className="card-title">
+                          Soy: <b>{users[key].name}</b>
+                        </h5>
+                        <p>
+                          MI correo es <u>{users[key].email}</u>
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                );
+              })} */}
+            </div>
+          </section>
         </div>
-        <div className="mb-3">
-          <div className="text-center">
-            <button
-              type="button"
-              className="btn btn-dark btn-lg"
-              onClick={saveSong}
-            >
-              Guardar
-            </button>
-          </div>
-        </div>
-      </form>
-      <ul>
-        {songs &&
-          Object.keys(songs).map((key) => {
-            return (
-              <li key={key} className=" mt-3 d-flex justify-content-between">
-                <div className="">
-                  <b>{songs[key].name}</b> de {songs[key].artist}
-                </div>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => deleteSong(key)}
-                >
-                  Borrar
-                </button>
-              </li>
-            );
-          })}
-      </ul>
-    </>
+      )}
+    </main>
   );
 }
 
