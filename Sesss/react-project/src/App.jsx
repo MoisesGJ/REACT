@@ -3,6 +3,7 @@ import './App.css';
 import { useForm } from 'react-hook-form';
 
 import postProduct from './lib/api';
+import MessageError from './Components/MessageError';
 
 function App() {
   const {
@@ -11,6 +12,7 @@ function App() {
     formState: { errors },
   } = useForm();
   const saveUser = (data) => postProduct(data);
+
   return (
     <main className="mx-auto flex min-h-screen w-full items-center justify-center bg-gray-900 text-white">
       <form
@@ -29,13 +31,13 @@ function App() {
                 required: 'Este input es requerido.',
                 minLength: {
                   value: 5,
-                  message: 'Necesitas escribir más de 5 caracteres',
+                  message: 'Necesitas escribir más de 5 caracteres.',
                 },
               })}
             />
           </div>
           {errors.name?.message && (
-            <span className="text-red-600">{errors.name?.message}</span>
+            <MessageError message={errors.name?.message} />
           )}
         </div>
         <div className="w-full transform bg-transparent text-lg duration-300 focus-within:border-indigo-500">
@@ -51,15 +53,11 @@ function App() {
                     /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/,
                   message: 'Este input solo debe ser una url de una imagen.',
                 },
-                min: {
-                  value: 50,
-                  message: 'El precio no debe ser menor a $50',
-                },
               })}
             />
           </div>
           {errors.picture?.message && (
-            <span className="text-red-600">{errors.picture?.message}</span>
+            <MessageError message={errors.picture?.message} />
           )}
         </div>
         <div className="w-full transform bg-transparent text-lg duration-300 focus-within:border-indigo-500">
@@ -76,24 +74,30 @@ function App() {
                 },
                 min: {
                   value: 50,
-                  message: 'El precio no debe ser menor a $50',
+                  message: 'El precio no debe ser menor a $50.',
                 },
               })}
             />
           </div>
           {errors.price?.message && (
-            <span className="text-red-600">{errors.price?.message}</span>
+            <MessageError message={errors.price?.message} />
           )}
         </div>
         <div className="w-full transform bg-transparent text-lg duration-300 focus-within:border-indigo-500">
           <select
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            {...register('category')}
+            {...register('category', {
+              required: 'Seleccione una opción.',
+            })}
           >
+            <option value=""></option>
             <option value="Computadoras">Computadoras</option>
             <option value="Electrodomésticos">Electrodomésticos</option>
             <option value="Accesorios">Accesorios</option>
           </select>
+          {errors.category?.message && (
+            <MessageError message={errors.category?.message} />
+          )}
         </div>
 
         <div className="w-full transform bg-transparent text-lg duration-300 focus-within:border-indigo-500">
@@ -111,7 +115,7 @@ function App() {
           ></textarea>
 
           {errors.description?.message && (
-            <span className="text-red-600">{errors.description?.message}</span>
+            <MessageError message={errors.description?.message} />
           )}
         </div>
 
